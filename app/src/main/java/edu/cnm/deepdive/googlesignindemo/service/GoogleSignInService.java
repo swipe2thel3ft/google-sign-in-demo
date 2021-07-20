@@ -9,8 +9,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import edu.cnm.deepdive.googlesignindemo.BuildConfig;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
 
 public class GoogleSignInService {
 
@@ -42,9 +46,13 @@ public class GoogleSignInService {
     return account;
   }
 
-  public Task<GoogleSignInAccount> refresh() {
-    return client.silentSignIn()
-        .addOnSuccessListener(this::setAccount);
+  public Single<GoogleSignInAccount> refresh() {
+    return Single.create((emitter) ->
+        client.silentSignIn()
+            .addOnSuccessListener(this::setAccount)
+            .addOnSuccessListener(emitter::onSuccess)
+            .addOnFailureListener(emitter::onError)
+    );
   }
 
   public void startSignIn(Activity activity, int requestCode) {
@@ -71,7 +79,7 @@ public class GoogleSignInService {
 
   private void setAccount(GoogleSignInAccount account) {
     this.account = account;
-    if (account != null) {
+    if(account != null) {
       Log.d(getClass().getSimpleName(), account.getIdToken());
     }
   }
@@ -82,4 +90,6 @@ public class GoogleSignInService {
 
   }
 
+
 }
+
