@@ -16,7 +16,7 @@ import retrofit2.http.Header;
 
 public interface WebServiceProxy {
 
-@GET("users/me")
+  @GET("users/me")
   Single<User> getProfile(@Header("Authorization") String bearerToken);
 
   static WebServiceProxy getInstance() {
@@ -27,7 +27,7 @@ public interface WebServiceProxy {
 
     private static final WebServiceProxy INSTANCE;
 
-    static  {
+    static {
       Gson gson = new GsonBuilder()
           .excludeFieldsWithoutExposeAnnotation()
           .create();
